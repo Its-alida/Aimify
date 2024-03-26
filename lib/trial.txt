@@ -1,0 +1,122 @@
+class ToDoListPage extends StatefulWidget {
+  const ToDoListPage({Key? key}) : super(key: key);
+
+  @override
+  _ToDoListPageState createState() => _ToDoListPageState();
+}
+
+class _ToDoListPageState extends State<ToDoListPage> {
+  int _selectedIndex = 0; // Index of the selected tab
+
+  List<String> todos = [];
+  List<bool> checked = []; // List to store checkbox states
+
+  // Define your bottom navigation items
+  static const List<BottomNavigationBarItem> _bottomNavBarItems = [
+    BottomNavigationBarItem(
+      icon: Icon(Icons.home),
+      label: 'Home',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.search),
+      label: 'Search',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.person),
+      label: 'Profile',
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: CustomAppBar(),
+      body: ListView.builder(
+        itemCount: todos.length,
+        itemBuilder: (context, index) {
+          return Container(
+            margin: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              color: Color.fromARGB(255, 25, 25, 25),
+            ),
+            child: ListTile(
+              leading: Checkbox(
+                value: false, // Set initial checkbox value here
+                onChanged: (bool? value) {
+                  // Handle checkbox onChanged event here
+                },
+              ),
+              title: Text(
+                todos[index],
+                style: const TextStyle(color: Colors.white),
+              ),
+              trailing: IconButton(
+                icon: const Icon(Icons.delete),
+                color: Colors.white,
+                onPressed: () {
+                  setState(() {
+                    todos.removeAt(index);
+                  });
+                },
+              ),
+            ),
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _addTodo,
+        tooltip: 'Add Todo',
+        backgroundColor: const Color.fromARGB(255, 129, 254, 225),
+        child: const Icon(Icons.add),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      bottomNavigationBar: BottomNavigationBar(
+        items: _bottomNavBarItems,
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+      ),
+    );
+  }
+
+  void _addTodo() async {
+    final TextEditingController textController = TextEditingController();
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Add Todo'),
+        content: TextField(
+          controller: textController,
+          autofocus: true,
+          decoration: const InputDecoration(labelText: 'Todo'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              if (textController.text.isNotEmpty) {
+                setState(() {
+                  todos.add(textController.text);
+                });
+                Navigator.of(context).pop();
+              }
+            },
+            child: const Text('Add'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    // Handle navigation here based on index
+  }
+}
